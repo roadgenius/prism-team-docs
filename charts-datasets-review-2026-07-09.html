@@ -170,13 +170,13 @@ a{color:var(--accent)}
 
   <div class="tiles">
     <div class="tile"><div class="n">15</div><div class="l">issues reported — <b>every one traced</b> to a cause</div></div>
-    <div class="tile"><div class="n">3 → 1</div><div class="l">crashes, <b>one shared suspect</b> in the write machinery</div></div>
+    <div class="tile"><div class="n">3 → 1</div><div class="l">crashes, one shared cause — <b>an expired login</b>, not the chart code. Fixed.</div></div>
     <div class="tile"><div class="n">0</div><div class="l">features actually removed — they were <b>hiding or moved</b></div></div>
     <div class="tile"><div class="n">2 / 4</div><div class="l">import binds failed because <b>agents have no search</b></div></div>
   </div>
 
   <div class="index">
-    <a class="ix" href="#s1"><span class="t">3 Spec-tab buttons crash <span class="chip bug">bug</span></span><span class="d">Real server crashes, one suspect. Fix first — stacks likely already recorded.</span></a>
+    <a class="ix" href="#s1"><span class="t">3 Spec-tab buttons crash <span class="chip fix">solved</span></span><span class="d">An expired login was shown as a masked crash instead of "sign in again". Reproduced exactly; fixed.</span></a>
     <a class="ix" href="#s2"><span class="t">Data tab shows IDs, not the dataset <span class="chip gap">gap</span></span><span class="d">Charts get the card every other bound section already has — link, preview, change, unbind.</span></a>
     <a class="ix" href="#s3"><span class="t">"Can't bind an existing dataset" <span class="chip hidden">hiding</span></span><span class="d">The picker exists; it hides not-ready datasets and caps at 40. New: search everything.</span></a>
     <a class="ix" href="#s3"><span class="t">Interactive-from-birth = no way back <span class="chip gap">gap</span></span><span class="d">Your hunch was right — born-interactive charts have zero data controls. Rebind is being built.</span></a>
@@ -188,14 +188,19 @@ a{color:var(--accent)}
 
   <!-- 1 crashes -->
   <section id="s1">
-    <h2 class="sec">1 · The three "Server Components render" errors <span class="chip bug">bug — fix first</span></h2>
+    <h2 class="sec">1 · The three "Server Components render" errors <span class="chip fix">solved &amp; fixed</span></h2>
     <p class="quote">"Unable to change chart type… add image to library… add view."</p>
     <ul class="tight">
-      <li><b>Real crashes on the server</b> — not permission blocks. Production hides the details on purpose; that's the vague wording.</li>
-      <li>All three buttons travel <b>one shared piece of write machinery</b>, reworked right before the current deploy — the prime suspect.</li>
-      <li>PRISM most likely <b>recorded the true error</b> in its run ledger the moment you clicked. Reading those entries is step one; even their absence narrows it to one earlier stage.</li>
+      <li><b>The cause wasn't the chart code.</b> We rebuilt the exact production setup and all three buttons worked —
+      then reproduced your exact error by one means only: <b>an expired/invalid login session</b>. When that happens
+      PRISM refused the action (correct) but showed it as a masked server crash (very much not correct).</li>
+      <li><b>Fixed:</b> an expired session now takes you to the login page with a return link, on every save-style
+      action — no more fake crashes. (This only ever showed in production; in development the login check is off,
+      which is why it never appeared in testing.)</li>
+      <li><b>One check closes your specific incident:</b> if reloading PRISM around then bounced you to the login page,
+      this was exactly it. If you were still logged in, say so — there's a recorded error trail we can pull.</li>
     </ul>
-    <div class="factline"><b>3</b> buttons <span class="sep">·</span> <b>1</b> write spine <span class="sep">·</span> fix ships with <b>tests on all three</b> so it can't quietly return</div>
+    <div class="factline"><b>3</b> buttons <span class="sep">·</span> <b>1</b> cause <span class="sep">·</span> reproduced, fixed — expired sessions now redirect to login</div>
   </section>
 
   <!-- 2 data tab -->
