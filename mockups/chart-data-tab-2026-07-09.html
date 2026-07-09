@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PRISM · Chart Data tab & binding fixes — 2026-07-09</title>
+<style>
+/* ————— document (annotation layer — NOT product UI) ————— */
+*{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --background:#ffffff; --foreground:#0a0a0a; --muted:#f5f5f5; --muted-fg:#525252;
+  --border:#e5e5e5; --primary:#1d4ed8; --primary-10:rgba(29,78,216,.10);
+  --destructive:#dc2626; --editor-accent:#1d4ed8;
+  --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;
+  --serif:'Charter','Georgia',serif;
+  --mono:ui-monospace,'SF Mono','Menlo',monospace;
+}
+body{font-family:var(--sans);background:#ececeb;color:#0a0a0a;-webkit-font-smoothing:antialiased}
+.doc{max-width:1380px;margin:0 auto;padding:40px 24px 120px}
+.doc-head h1{font-size:21px;font-weight:650;letter-spacing:-.01em}
+.doc-sub{color:#6b6b6b;font-size:13px;margin:6px 0 8px;max-width:940px;line-height:1.55}
+.doc-note{font-family:var(--mono);font-size:11px;color:#8a8a8a;margin-bottom:36px}
+section{margin-top:52px}
+.sec-head{display:flex;align-items:baseline;gap:10px;margin-bottom:4px}
+.sec-head .k{font-family:var(--mono);font-size:11px;font-weight:600;color:#fff;background:#0a0a0a;border-radius:4px;padding:2px 7px}
+.sec-head h2{font-size:16px;font-weight:650;letter-spacing:-.01em}
+.sec-intro{font-size:13px;color:#565656;max-width:940px;line-height:1.55;margin-bottom:18px}
+.tag{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;border-radius:3px;padding:2px 6px;margin-bottom:8px}
+.tag.now{background:#fee2e2;color:#991b1b}
+.tag.new{background:#dcfce7;color:#166534}
+.viewport{overflow-x:auto;border-radius:10px;box-shadow:0 1px 2px rgba(0,0,0,.07),0 8px 28px -12px rgba(0,0,0,.18);margin-bottom:10px;background:#fff}
+.frame{width:920px;background:var(--background)}
+.legend{font-size:12px;color:#565656;line-height:1.7;margin:8px 2px 0;max-width:960px}
+.legend b{color:#0a0a0a;font-weight:600}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:start}
+@media(max-width:1100px){.grid2{grid-template-columns:1fr}}
+
+/* ————— product UI ————— */
+.panel{width:380px}
+.panel-head{display:flex;align-items:center;justify-content:space-between;padding:13px 16px;border-bottom:1px solid var(--border)}
+.panel-head h3{font-size:14px;font-weight:650}
+.panel-head .x{color:var(--muted-fg);font-size:13px}
+.tabs{display:flex;gap:2px;padding:8px 12px 0;border-bottom:1px solid var(--border)}
+.tab{font-size:12.5px;font-weight:500;color:var(--muted-fg);padding:6px 12px;border-radius:6px 6px 0 0}
+.tab.cur{color:var(--primary);font-weight:600;box-shadow:inset 0 -2px 0 var(--primary)}
+.panel-body{padding:14px 16px}
+.dl{display:grid;grid-template-columns:110px 1fr;row-gap:9px;font-size:12.5px}
+.dl dt{color:var(--muted-fg)}
+.dl dd{font-family:var(--mono);font-size:11.5px;color:#0a0a0a;word-break:break-all}
+.fieldlab{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted-fg);margin:14px 0 8px}
+.radio{display:flex;align-items:center;gap:8px;font-size:12.5px;margin-bottom:6px;color:#333}
+.radio .dot{width:13px;height:13px;border-radius:50%;border:1.5px solid #bbb}
+.radio.on .dot{border-color:var(--primary);box-shadow:inset 0 0 0 3.5px var(--primary)}
+.dscard{border:1px solid var(--border);border-radius:8px;padding:11px 12px;background:#fff}
+.dscard .nm{font-size:13px;font-weight:600}
+.dscard .nm a{color:var(--primary);text-decoration:none}
+.dscard .meta{font-family:var(--mono);font-size:10.5px;color:var(--muted-fg);margin-top:2px}
+.dscard .fresh{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#166534;margin-top:7px}
+.dscard .fresh .d{width:6px;height:6px;border-radius:50%;background:#16a34a}
+.minitable{border-collapse:collapse;width:100%;font-size:10.5px;font-family:var(--mono);margin-top:9px}
+.minitable th{text-align:left;border-bottom:1px solid #d8d8d8;padding:3px 6px;font-weight:600;color:#555;background:#fafafa}
+.minitable td{border-bottom:1px solid #f0f0f0;padding:3px 6px;color:#444}
+.minitable .more{color:#999;font-style:italic;border-bottom:none}
+.actrow{display:flex;gap:8px;margin-top:12px}
+.ghostbtn{display:inline-flex;align-items:center;border-radius:6px;border:1px solid var(--border);background:#fff;padding:5px 10px;font-size:12px;font-weight:500;color:var(--muted-fg)}
+.dangerbtn{display:inline-flex;align-items:center;border-radius:6px;border:1px solid rgba(220,38,38,.3);background:#fff;padding:5px 10px;font-size:12px;font-weight:500;color:var(--destructive)}
+.primarybtn{display:inline-flex;align-items:center;border-radius:6px;background:var(--editor-accent);color:#fff;padding:7px 14px;font-size:13px;font-weight:600}
+.helpline{font-size:11.5px;color:#8a8a8a;line-height:1.5;margin-top:8px}
+/* builder empty / search */
+.search{display:flex;align-items:center;gap:8px;border:1px solid var(--border);border-radius:6px;padding:7px 10px;font-size:13px;color:#9a9a9a;margin-bottom:12px}
+.emptybox{padding:24px;text-align:center}
+.emptybox h4{font-size:14px;font-weight:600;margin-bottom:4px}
+.emptybox p{font-size:12.5px;color:var(--muted-fg);margin-bottom:14px;line-height:1.5}
+.list{display:flex;flex-direction:column;gap:8px}
+.grouplab{font-size:11px;font-weight:600;letter-spacing:.04em;text-transform:uppercase;color:var(--muted-fg);margin:10px 0 4px}
+.rowcard{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--border);border-radius:8px;padding:10px 12px;background:#fff}
+.rowcard .nm{font-size:13px;font-weight:600}
+.rowcard .meta{font-family:var(--mono);font-size:10.5px;color:var(--muted-fg)}
+.rowcard.dim{opacity:.75;background:#fcfcfb}
+.badge{display:inline-flex;align-items:center;font-size:10.5px;font-weight:600;border-radius:9999px;padding:2px 8px}
+.badge.warn{background:#fffbeb;color:#92400e;border:1px solid rgba(180,83,9,.25)}
+.badge.ok{background:#f0fdf4;color:#166534;border:1px solid rgba(22,101,52,.2)}
+/* chart render mocks */
+.chartmock{padding:18px 20px}
+.chartmock .t{font-family:var(--serif);font-size:14.5px;font-weight:600}
+.chartmock .s{font-size:10.5px;color:var(--muted-fg);margin:2px 0 12px}
+.srcline{border-top:1px solid var(--border);margin-top:12px;padding-top:7px;font-family:var(--mono);font-size:9.5px;color:#8a8a8a}
+svg text{font-family:var(--sans)}
+</style>
+</head>
+<body>
+<div class="doc">
+  <div class="doc-head"><h1>Charts — Data tab, bind-to-existing, display fixes</h1></div>
+  <p class="doc-sub">Editor-review round 2026-07-09 (France camping statistics). Three families of fix: <b>the chart Data
+  tab learns what every other bound section already shows</b> (dataset name, link, change, unbind); <b>the bind picker
+  stops dead-ending</b> when datasets exist but aren't "ready"; and <b>three chart-render defects</b> (pie label glue,
+  tie-color asymmetry, internal source footnote). Companion doc:
+  <span style="font-family:var(--mono);font-size:11.5px">plans/charts-tables-binding-ux/2026-07-09-editor-round-2.md</span></p>
+  <p class="doc-note">NOW frames are anatomy-true to InspectorNative.tsx / NativeChartBuilder.tsx on main @ 2026-07-09 ·
+  NEW frames reuse the display-section DataTab pattern (one grammar across families)</p>
+
+  <!-- E1 -->
+  <section>
+    <div class="sec-head"><span class="k">E1</span><h2>Chart settings → Data: from two opaque rows to the dataset itself</h2></div>
+    <p class="sec-intro">Today a bound chart's Data tab shows exactly two rows — a raw revision id and a schema version —
+    with no dataset name, no link, no way to change or unbind. Tables, displays, and collections all already show
+    name + link + Change dataset + Unbind. Charts adopt the same card.</p>
+    <div class="grid2">
+      <div>
+        <span class="tag now">Now — bound native chart</span>
+        <div class="viewport"><div class="frame panel">
+          <div class="panel-head"><h3>Chart settings</h3><span class="x">✕</span></div>
+          <div class="tabs"><span class="tab">Spec</span><span class="tab cur">Data</span><span class="tab">Caption &amp; Alt</span></div>
+          <div class="panel-body">
+            <dl class="dl">
+              <dt>Bound revision</dt><dd>rev_9f2c41d07a5be3</dd>
+              <dt>Schema version</dt><dd>3</dd>
+            </dl>
+            <div class="fieldlab">Revision policy</div>
+            <div class="radio on"><span class="dot"></span> Follow latest</div>
+            <div class="radio"><span class="dot"></span> Pin to this revision</div>
+          </div>
+        </div></div>
+        <p class="legend">"French campers by age group" is bound to… <b>an id</b>. The canvas chip knows the dataset's
+        name; the tab it opens doesn't. Nothing here is clickable, changeable, or unbindable.</p>
+      </div>
+      <div>
+        <span class="tag new">New — the dataset card (display-section pattern)</span>
+        <div class="viewport"><div class="frame panel">
+          <div class="panel-head"><h3>Chart settings</h3><span class="x">✕</span></div>
+          <div class="tabs"><span class="tab">Spec</span><span class="tab cur">Data</span><span class="tab">Caption &amp; Alt</span></div>
+          <div class="panel-body">
+            <div class="dscard">
+              <div class="nm"><a href="#">French campers by age group ↗</a></div>
+              <div class="meta">cc.camping-statistics-multiple-locations.france · r6 · updated 2mo ago</div>
+              <div class="fresh"><span class="d"></span> Current — following latest</div>
+              <table class="minitable">
+                <tr><th>age_group</th><th>share_pct</th></tr>
+                <tr><td>Under 27</td><td>5</td></tr>
+                <tr><td>27–44</td><td>31</td></tr>
+                <tr><td class="more" colspan="2">…4 more rows — open dataset for all</td></tr>
+              </table>
+            </div>
+            <div class="fieldlab">Revision policy</div>
+            <div class="radio on"><span class="dot"></span> Follow latest</div>
+            <div class="radio"><span class="dot"></span> Pin to this revision</div>
+            <div class="actrow"><span class="ghostbtn">Change dataset…</span><span class="dangerbtn">Unbind</span></div>
+            <p class="helpline">Unbind freezes the chart as a static image; the dataset keeps its data. Changing the
+            dataset on a published chart routes through review, like every dataset change.</p>
+          </div>
+        </div></div>
+        <p class="legend"><b>The name is a link</b> to the dataset page; first rows preview inline so "what is this
+        bound to?" is answered without leaving. Change dataset… reopens the picker staged on this chart;
+        Unbind uses the already-built (never-wired) <span style="font-family:var(--mono);font-size:11px">charts.unbindDataset</span>.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- E2 -->
+  <section>
+    <div class="sec-head"><span class="k">E2</span><h2>Bind picker: existing datasets stay findable — even when not "ready"</h2></div>
+    <p class="sec-intro">The picker only lists datasets with a completed revision, from the 40 newest. A dataset that
+    exists as a draft — or is older than the cap — vanishes, and the modal's only affordance becomes "+ New dataset ↗".
+    That's the trap the editor hit: the France dataset existed, the picker couldn't say so.</p>
+    <div class="grid2">
+      <div>
+        <span class="tag now">Now — the dead end</span>
+        <div class="viewport"><div class="frame" style="width:560px">
+          <div class="panel-head"><h3>Bind data — French campers by age group</h3><span class="x">Cancel</span></div>
+          <div class="emptybox">
+            <h4>No dataset is ready to bind on this site</h4>
+            <p>A dataset needs a source and a completed revision first.</p>
+            <div><span class="primarybtn">+ New dataset ↗</span></div>
+          </div>
+        </div></div>
+        <p class="legend">The editor reads this as <b>"there is no way to bind an existing dataset"</b> — the feature
+        exists, the empty state hides it. Search is also client-side over the capped list, so old datasets silently
+        disappear as the corpus grows.</p>
+      </div>
+      <div>
+        <span class="tag new">New — search everything, explain readiness</span>
+        <div class="viewport"><div class="frame" style="width:560px">
+          <div class="panel-head"><h3>Bind data — French campers by age group</h3><span class="x">Cancel</span></div>
+          <div style="padding:16px 20px">
+            <div class="search">🔍 camping france</div>
+            <div class="grouplab">Ready to bind</div>
+            <div class="list">
+              <div class="rowcard"><div><div class="nm">France camping statistics</div><div class="meta">cc.camping-statistics-multiple-locations.france · r6</div></div><span class="badge ok">✓ ready</span></div>
+            </div>
+            <div class="grouplab">Found, but not ready yet</div>
+            <div class="list">
+              <div class="rowcard dim"><div><div class="nm">Camping nights by region (draft)</div><div class="meta">cc.camping-nights.fr-regions · draft only</div></div><span class="badge warn">Complete the draft to bind ↗</span></div>
+            </div>
+            <div class="grouplab" style="margin-top:14px">Nothing right?</div>
+            <div class="rowcard"><div class="nm" style="font-weight:500;color:#555">+ New dataset — paste data…</div></div>
+          </div>
+        </div></div>
+        <p class="legend">Search runs <b>server-side over all datasets</b> (same substring search the /datasets library
+        already has — name, key, description). Not-ready matches show <b>with the reason and the one-click path to fix
+        it</b> instead of vanishing. Create-new drops to the bottom, where it belongs.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- E3 -->
+  <section>
+    <div class="sec-head"><span class="k">E3</span><h2>Chart display: label glue, tie colors, the phantom source line</h2></div>
+    <p class="sec-intro">Three render defects from the review. Pie labels concatenate label + value with a bare space
+    ("over 78 5%") and can overlap on small adjacent slices; bar charts give two equal values different colors (only
+    the first max gets the accent); and charts bound to internal datasets auto-print a "Source: … · r6" footnote that
+    isn't a real source.</p>
+    <div class="grid2">
+      <div>
+        <span class="tag now">Now</span>
+        <div class="viewport"><div class="frame" style="width:560px"><div class="chartmock">
+          <div class="t">French campers by age group</div>
+          <div class="s">Share of campers, 2024</div>
+          <svg viewBox="0 0 520 190" width="520" height="190">
+            <circle cx="150" cy="95" r="62" fill="none" stroke="#c7d2fe" stroke-width="30"/>
+            <path d="M150 33 A62 62 0 0 1 208 76" fill="none" stroke="#4338ca" stroke-width="30"/>
+            <path d="M208 76 A62 62 0 0 1 205 122" fill="none" stroke="#0d9488" stroke-width="30"/>
+            <line x1="212" y1="60" x2="240" y2="52" stroke="#bbb"/>
+            <text x="244" y="55" font-size="11" fill="#333">over 78 5%</text>
+            <line x1="214" y1="70" x2="240" y2="63" stroke="#bbb"/>
+            <text x="244" y="66" font-size="11" fill="#333">under 27 5%</text>
+            <text x="244" y="61" font-size="11" fill="#b91c1c" opacity=".55">← overlapping</text>
+            <line x1="96" y1="140" x2="66" y2="152" stroke="#bbb"/>
+            <text x="10" y="156" font-size="11" fill="#333">45–60 38%</text>
+          </svg>
+          <div class="srcline">Source: France camping statistics · cc.camping-statistics-multiple-locations.france · r6</div>
+        </div></div></div>
+        <p class="legend">"over 78 5%" reads as one number-soup; two 5% slices stack their labels; and the footnote
+        leaks an internal dataset key onto the published page.</p>
+      </div>
+      <div>
+        <span class="tag new">New</span>
+        <div class="viewport"><div class="frame" style="width:560px"><div class="chartmock">
+          <div class="t">French campers by age group</div>
+          <div class="s">Share of campers, 2024</div>
+          <svg viewBox="0 0 520 190" width="520" height="190">
+            <circle cx="150" cy="95" r="62" fill="none" stroke="#c7d2fe" stroke-width="30"/>
+            <path d="M150 33 A62 62 0 0 1 208 76" fill="none" stroke="#4338ca" stroke-width="30"/>
+            <path d="M208 76 A62 62 0 0 1 205 122" fill="none" stroke="#0d9488" stroke-width="30"/>
+            <line x1="212" y1="60" x2="240" y2="44" stroke="#bbb"/>
+            <text x="244" y="47" font-size="11" fill="#333">Over 78 <tspan fill="#777">· 5%</tspan></text>
+            <line x1="214" y1="74" x2="240" y2="78" stroke="#bbb"/>
+            <text x="244" y="81" font-size="11" fill="#333">Under 27 <tspan fill="#777">· 5%</tspan></text>
+            <line x1="96" y1="140" x2="66" y2="152" stroke="#bbb"/>
+            <text x="10" y="156" font-size="11" fill="#333">45–60 <tspan fill="#777">· 38%</tspan></text>
+          </svg>
+          <div class="srcline" style="color:#c9c9c9;text-decoration:line-through">Source: internal dataset ref</div>
+        </div></div></div>
+        <p class="legend"><b>Separator + muted value</b> (the tooltip already does "Over 78: 5%" — the canvas catches
+        up); labels get a <b>push-apart pass</b> per side (deterministic, no overlaps); the auto source line is
+        <b>suppressed for internal datasets</b> — only a real external source (or hand-typed attribution) prints.</p>
+      </div>
+    </div>
+    <div style="margin-top:24px" class="grid2">
+      <div>
+        <span class="tag now">Now — tie gets two colors</span>
+        <div class="viewport"><div class="frame" style="width:560px"><div class="chartmock">
+          <div class="t">Camping nights by French region, 2024</div>
+          <div class="s">Millions of nights</div>
+          <svg viewBox="0 0 520 150" width="520" height="150">
+            <rect x="10" y="18" width="290" height="22" fill="#4338ca"/><text x="306" y="33" font-size="11" fill="#333">Occitanie — 26</text>
+            <rect x="10" y="46" width="290" height="22" fill="#c7d2fe"/><text x="306" y="61" font-size="11" fill="#333">Nouvelle-Aquitaine — 26</text>
+            <rect x="10" y="74" width="212" height="22" fill="#c7d2fe"/><text x="228" y="89" font-size="11" fill="#333">Auvergne-Rhône-Alpes — 19</text>
+            <rect x="10" y="102" width="145" height="22" fill="#c7d2fe"/><text x="161" y="117" font-size="11" fill="#333">Bretagne — 13</text>
+          </svg>
+        </div></div></div>
+        <p class="legend">Both regions have <b>26</b>, but only the first-sorted bar gets the accent — the color implies
+        a difference that isn't in the data.</p>
+      </div>
+      <div>
+        <span class="tag new">New — ties share the accent; emphasis is a control</span>
+        <div class="viewport"><div class="frame" style="width:560px"><div class="chartmock">
+          <div class="t">Camping nights by French region, 2024</div>
+          <div class="s">Millions of nights</div>
+          <svg viewBox="0 0 520 150" width="520" height="150">
+            <rect x="10" y="18" width="290" height="22" fill="#4338ca"/><text x="306" y="33" font-size="11" fill="#333">Occitanie — 26</text>
+            <rect x="10" y="46" width="290" height="22" fill="#4338ca"/><text x="306" y="61" font-size="11" fill="#333">Nouvelle-Aquitaine — 26</text>
+            <rect x="10" y="74" width="212" height="22" fill="#c7d2fe"/><text x="228" y="89" font-size="11" fill="#333">Auvergne-Rhône-Alpes — 19</text>
+            <rect x="10" y="102" width="145" height="22" fill="#c7d2fe"/><text x="161" y="117" font-size="11" fill="#333">Bretagne — 13</text>
+          </svg>
+        </div></div></div>
+        <p class="legend"><b>Equal values, equal color</b> — every bar tied at the max shares the accent. The existing
+        (unsurfaced) semantic controls — highlight a named category, good/bad tones, rank gradient — get inspector
+        controls, so editors steer emphasis without a raw color picker.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- E4 -->
+  <section>
+    <div class="sec-head"><span class="k">E4</span><h2>Dataset page: consumers that include charts, and link back</h2></div>
+    <p class="sec-intro">The dataset page's "Bound consumers" list is computed from section rows — chart bindings live on
+    the chart entity, so a dataset used only by charts claims "No sections bind to this dataset yet." The fix makes chart
+    consumers visible and clickable; a bind action from this side stays out of scope for now (the editor-side flows are
+    the campaign path).</p>
+    <div class="viewport"><div class="frame" style="width:560px">
+      <div style="padding:16px 20px">
+        <div class="fieldlab" style="margin-top:0">Bound consumers</div>
+        <div class="list">
+          <div class="rowcard"><div><div class="nm">French campers by age group <span style="font-weight:400;color:#888">· chart</span></div><div class="meta">France camping statistics · cc/en-gb ↗</div></div><span class="badge ok">follows latest</span></div>
+          <div class="rowcard"><div><div class="nm">Camping nights by region <span style="font-weight:400;color:#888">· chart</span></div><div class="meta">France camping statistics · cc/en-gb ↗</div></div><span class="badge ok">follows latest</span></div>
+          <div class="rowcard"><div><div class="nm">Campsite count table <span style="font-weight:400;color:#888">· table</span></div><div class="meta">France camping guide · cc/en-gb ↗</div></div><span class="badge warn">pinned · r4</span></div>
+        </div>
+      </div>
+    </div></div>
+    <p class="legend">Charts appear beside tables/displays, each row links to its article. This answers the Slack ask —
+    "there is no way to bind the dataset to an article from the dataset itself" — with the read side first; the
+    editor-side picker (E2) remains the bind path.</p>
+  </section>
+</div>
+</body>
+</html>
