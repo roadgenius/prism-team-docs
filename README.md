@@ -1,6 +1,6 @@
 # PRISM team docs
 
-Shareable, plain-language write-ups of what's changing in PRISM — one self-contained HTML file per topic. Open any `.html` file in a browser (download it or clone this repo; GitHub shows the raw source, not the rendered page).
+Shareable, plain-language write-ups of what's changing in PRISM — one self-contained HTML file per topic. Open any `.html` file in a browser (rendered via GitHub Pages: https://roadgenius.github.io/prism-team-docs/charts-datasets-review-2026-07-09.html).
 
 | Doc | What it covers | Date |
 | --- | --- | --- |

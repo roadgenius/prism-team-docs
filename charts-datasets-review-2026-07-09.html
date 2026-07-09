@@ -1,150 +1,215 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Charts &amp; datasets — review outcome, 9 Jul 2026</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --ink:#0a0a0a; --ink-2:#3d3d3d; --ink-3:#6b6b6b; --muted:#f5f5f4; --border:#e5e5e3;
-  --primary:#1d4ed8; --ok:#166534; --ok-bg:#f0fdf4; --ok-line:rgba(22,101,52,.25);
+  --bg:#f2f1ef; --card:#ffffff; --ink:#141310; --ink-2:#3d3b36; --ink-3:#6d6a63; --border:#e3e1dc; --muted:#f5f4f1;
+  --accent:#1d4ed8;
+  --ok:#166534; --ok-bg:#f0fdf4; --ok-line:rgba(22,101,52,.25);
   --warn:#92400e; --warn-bg:#fffbeb; --warn-line:rgba(180,83,9,.3);
-  --bad:#991b1b; --bad-bg:#fee2e2;
+  --bad:#991b1b; --bad-bg:#fee2e2; --bad-line:rgba(153,27,27,.2);
+  --hidden-fg:#5b21b6; --hidden-bg:#ede9fe;
+  --moved-fg:#075985; --moved-bg:#e0f2fe;
+  --shadow:0 1px 2px rgba(0,0,0,.04);
+  --mockshadow:0 6px 22px -12px rgba(0,0,0,.18);
+  --m-bg:#ffffff; --m-border:#e5e5e3; --m-ink:#0a0a0a; --m-ink3:#6b6b6b; --m-muted:#fafafa; --m-primary:#1d4ed8;
   --sans:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;
   --serif:'Charter','Georgia',serif; --mono:ui-monospace,'SF Mono','Menlo',monospace;
 }
-body{font-family:var(--sans);background:#f2f1ef;color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.55}
-.doc{max-width:860px;margin:0 auto;padding:44px 20px 120px}
-h1{font-family:var(--serif);font-size:30px;font-weight:650;letter-spacing:-.015em;line-height:1.15}
-.sub{color:var(--ink-3);font-size:14px;margin:10px 0 0;max-width:720px}
-.date{font-family:var(--mono);font-size:11px;color:#8a8a8a;margin-top:8px}
-.tldr{background:#fff;border:1px solid var(--border);border-radius:12px;padding:22px 24px;margin:30px 0 8px;box-shadow:0 1px 2px rgba(0,0,0,.04)}
-.tldr h2{font-size:15px;font-weight:650;margin-bottom:10px}
-.tldr ul{margin-left:18px;font-size:14px}
-.tldr li{margin-bottom:8px;list-style:disc}
-.tldr b{font-weight:600}
-section{margin-top:44px}
-h2.sec{font-size:19px;font-weight:650;letter-spacing:-.01em;margin-bottom:4px}
-.quote{font-size:13px;color:var(--ink-3);border-left:3px solid var(--border);padding:2px 0 2px 12px;margin:10px 0;font-style:italic}
-p.body{font-size:14px;color:var(--ink-2);margin:10px 0;max-width:760px}
-p.body b{color:var(--ink);font-weight:600}
-p.body code,.tldr code{font-family:var(--mono);font-size:.86em;background:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
-.chip{display:inline-block;font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border-radius:4px;padding:2.5px 8px;vertical-align:2px;margin-left:8px}
+@media (prefers-color-scheme: dark){:root{
+  --bg:#171614; --card:#211f1c; --ink:#f0eee9; --ink-2:#cbc8c1; --ink-3:#98948b; --border:#38352f; --muted:#2a2823;
+  --accent:#9db9f7;
+  --ok:#86dfa8; --ok-bg:#12281a; --ok-line:rgba(134,223,168,.3);
+  --warn:#e8b36a; --warn-bg:#2b2113; --warn-line:rgba(232,179,106,.3);
+  --bad:#f29a9a; --bad-bg:#3a1a1a; --bad-line:rgba(242,154,154,.25);
+  --hidden-fg:#c4b0f5; --hidden-bg:#291f3d;
+  --moved-fg:#93c8e8; --moved-bg:#142833;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+  --mockshadow:0 6px 22px -12px rgba(0,0,0,.6);
+}}
+:root[data-theme="dark"]{
+  --bg:#171614; --card:#211f1c; --ink:#f0eee9; --ink-2:#cbc8c1; --ink-3:#98948b; --border:#38352f; --muted:#2a2823;
+  --accent:#9db9f7;
+  --ok:#86dfa8; --ok-bg:#12281a; --ok-line:rgba(134,223,168,.3);
+  --warn:#e8b36a; --warn-bg:#2b2113; --warn-line:rgba(232,179,106,.3);
+  --bad:#f29a9a; --bad-bg:#3a1a1a; --bad-line:rgba(242,154,154,.25);
+  --hidden-fg:#c4b0f5; --hidden-bg:#291f3d;
+  --moved-fg:#93c8e8; --moved-bg:#142833;
+  --shadow:0 1px 2px rgba(0,0,0,.4);
+  --mockshadow:0 6px 22px -12px rgba(0,0,0,.6);
+}
+:root[data-theme="light"]{
+  --bg:#f2f1ef; --card:#ffffff; --ink:#141310; --ink-2:#3d3b36; --ink-3:#6d6a63; --border:#e3e1dc; --muted:#f5f4f1;
+  --accent:#1d4ed8;
+  --ok:#166534; --ok-bg:#f0fdf4; --ok-line:rgba(22,101,52,.25);
+  --warn:#92400e; --warn-bg:#fffbeb; --warn-line:rgba(180,83,9,.3);
+  --bad:#991b1b; --bad-bg:#fee2e2; --bad-line:rgba(153,27,27,.2);
+  --hidden-fg:#5b21b6; --hidden-bg:#ede9fe;
+  --moved-fg:#075985; --moved-bg:#e0f2fe;
+  --shadow:0 1px 2px rgba(0,0,0,.04);
+  --mockshadow:0 6px 22px -12px rgba(0,0,0,.18);
+}
+body{font-family:var(--sans);background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased;line-height:1.5}
+.doc{max-width:900px;margin:0 auto;padding:44px 20px 120px}
+h1{font-family:var(--serif);font-size:29px;font-weight:650;letter-spacing:-.015em;line-height:1.15;text-wrap:balance}
+.sub{color:var(--ink-3);font-size:13.5px;margin:10px 0 0;max-width:700px}
+.date{font-family:var(--mono);font-size:11px;color:var(--ink-3);opacity:.8;margin-top:8px}
+/* scoreboard */
+.tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:28px 0 10px}
+@media(max-width:760px){.tiles{grid-template-columns:repeat(2,1fr)}}
+.tile{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:14px 16px;box-shadow:var(--shadow)}
+.tile .n{font-family:var(--serif);font-size:30px;font-weight:650;letter-spacing:-.02em;line-height:1;font-variant-numeric:tabular-nums}
+.tile .l{font-size:11.5px;color:var(--ink-3);margin-top:6px;line-height:1.35}
+.tile .l b{color:var(--ink-2);font-weight:600}
+/* index grid */
+.index{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 0 6px}
+@media(max-width:760px){.index{grid-template-columns:1fr}}
+.ix{display:block;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:11px 13px;text-decoration:none;color:var(--ink);box-shadow:var(--shadow)}
+.ix:hover{border-color:var(--ink-3)}
+.ix .t{font-size:13px;font-weight:600;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.ix .d{font-size:12px;color:var(--ink-3);margin-top:3px;line-height:1.45}
+.chip{display:inline-block;font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;border-radius:4px;padding:2.5px 7px;white-space:nowrap;flex-shrink:0}
 .chip.bug{background:var(--bad-bg);color:var(--bad)}
-.chip.hidden{background:#ede9fe;color:#5b21b6}
+.chip.hidden{background:var(--hidden-bg);color:var(--hidden-fg)}
 .chip.gap{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
-.chip.moved{background:#e0f2fe;color:#075985}
-.chip.fixed{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.chip.moved{background:var(--moved-bg);color:var(--moved-fg)}
+.chip.fix{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
 .chip.decision{background:var(--muted);color:var(--ink-3);border:1px solid var(--border)}
-.answer{background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:8px;padding:10px 14px;font-size:13.5px;color:#14532d;margin:12px 0}
+/* sections */
+section{margin-top:46px;scroll-margin-top:20px}
+h2.sec{font-size:18px;font-weight:650;letter-spacing:-.01em;margin-bottom:4px;text-wrap:balance}
+h2.sec .chip{vertical-align:2px;margin-left:8px}
+.quote{font-size:12.5px;color:var(--ink-3);border-left:3px solid var(--border);padding:1px 0 1px 11px;margin:8px 0 10px;font-style:italic;max-width:720px}
+p.body{font-size:13.5px;color:var(--ink-2);margin:8px 0;max-width:740px}
+p.body b{color:var(--ink);font-weight:600}
+p.body code,.factline code,.answer code,.foot code{font-family:var(--mono);font-size:.86em;background:var(--muted);border:1px solid var(--border);border-radius:4px;padding:1px 5px}
+ul.tight{margin:8px 0 8px 18px;max-width:740px}
+ul.tight li{font-size:13.5px;color:var(--ink-2);margin-bottom:6px}
+ul.tight b{color:var(--ink);font-weight:600}
+.factline{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-family:var(--mono);font-size:11px;color:var(--ink-3);background:var(--muted);border:1px solid var(--border);border-radius:8px;padding:8px 12px;margin:10px 0}
+.factline .sep{opacity:.45}
+.factline b{color:var(--ink);font-weight:600}
+.callout{border:1px solid var(--warn-line);background:var(--warn-bg);border-radius:8px;padding:10px 13px;font-size:13px;color:var(--warn);margin:12px 0;max-width:740px}
+.callout b{font-weight:650}
+.answer{background:var(--ok-bg);border:1px solid var(--ok-line);border-radius:8px;padding:10px 13px;font-size:13px;color:var(--ok);margin:12px 0;max-width:740px}
 .answer b{font-weight:650}
-/* mock frames */
+/* check row (§2) */
+.checkrow{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.check{display:flex;align-items:center;gap:7px;border:1px solid var(--border);background:var(--card);border-radius:9999px;padding:5px 12px;font-size:12px;font-weight:600}
+.check .y{color:var(--ok)}.check .x{color:var(--bad)}
+.check small{font-weight:400;color:var(--ink-3)}
+/* flow diagram (§6) */
+.flow{display:flex;align-items:stretch;gap:0;margin:14px 0;flex-wrap:wrap}
+.fbox{flex:1;min-width:200px;border:1px solid var(--border);background:var(--card);border-radius:10px;padding:12px 14px;box-shadow:var(--shadow)}
+.fbox .fk{font-family:var(--mono);font-size:9.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-3)}
+.fbox .ft{font-size:13.5px;font-weight:650;margin-top:3px}
+.fbox .fd{font-size:11.5px;color:var(--ink-3);margin-top:4px;line-height:1.45}
+.farrow{display:flex;align-items:center;padding:0 10px;font-size:18px;color:var(--ink-3)}
+@media(max-width:700px){.farrow{transform:rotate(90deg);justify-content:center;width:100%;padding:2px 0}}
+.flow.old .fbox{border-style:dashed}
+.flowlab{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:3px;padding:2px 6px;display:inline-block;margin:6px 0 0}
+.flowlab.now{background:var(--bad-bg);color:var(--bad)}
+.flowlab.new{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+/* mock frames — pinned light (product screenshots) */
 .mockrow{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin:16px 0 6px}
 @media(max-width:760px){.mockrow{grid-template-columns:1fr}}
 .mocklab{font-family:var(--mono);font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:3px;padding:2px 6px;display:inline-block;margin-bottom:6px}
 .mocklab.now{background:var(--bad-bg);color:var(--bad)}
-.mocklab.new{background:#dcfce7;color:var(--ok)}
-.mock{background:#fff;border:1px solid var(--border);border-radius:10px;box-shadow:0 6px 22px -12px rgba(0,0,0,.18);overflow:hidden}
-.mock .mhead{display:flex;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--border);font-size:13px;font-weight:650}
-.mock .mhead span{color:var(--ink-3);font-weight:400;font-size:12px}
-.mtabs{display:flex;gap:2px;padding:6px 10px 0;border-bottom:1px solid var(--border)}
-.mtab{font-size:11.5px;color:var(--ink-3);padding:5px 10px}
-.mtab.cur{color:var(--primary);font-weight:600;box-shadow:inset 0 -2px 0 var(--primary)}
+.mocklab.new{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
+.mock{background:var(--m-bg);border:1px solid var(--m-border);border-radius:10px;box-shadow:var(--mockshadow);overflow:hidden;color:var(--m-ink)}
+.mock .mhead{display:flex;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--m-border);font-size:13px;font-weight:650}
+.mock .mhead span{color:var(--m-ink3);font-weight:400;font-size:12px}
+.mtabs{display:flex;gap:2px;padding:6px 10px 0;border-bottom:1px solid var(--m-border)}
+.mtab{font-size:11.5px;color:var(--m-ink3);padding:5px 10px}
+.mtab.cur{color:var(--m-primary);font-weight:600;box-shadow:inset 0 -2px 0 var(--m-primary)}
 .mbody{padding:12px 14px;font-size:12px}
 .dl{display:grid;grid-template-columns:105px 1fr;row-gap:8px}
-.dl dt{color:var(--ink-3)}
-.dl dd{font-family:var(--mono);font-size:10.5px;word-break:break-all}
-.dscard{border:1px solid var(--border);border-radius:8px;padding:10px 11px}
+.dl dt{color:var(--m-ink3)}
+.dl dd{font-family:var(--mono);font-size:10.5px;word-break:break-all;font-variant-numeric:tabular-nums}
+.dscard{border:1px solid var(--m-border);border-radius:8px;padding:10px 11px}
 .dscard .nm{font-size:12.5px;font-weight:600}
-.dscard .nm a{color:var(--primary);text-decoration:none}
-.dscard .meta{font-family:var(--mono);font-size:9.5px;color:var(--ink-3);margin-top:2px}
-.dscard .fresh{font-size:10.5px;color:var(--ok);margin-top:6px}
+.dscard .nm a{color:var(--m-primary);text-decoration:none}
+.dscard .meta{font-family:var(--mono);font-size:9.5px;color:var(--m-ink3);margin-top:2px}
+.dscard .fresh{font-size:10.5px;color:#166534;margin-top:6px}
 .minitable{border-collapse:collapse;width:100%;font-size:9.5px;font-family:var(--mono);margin-top:8px}
-.minitable th{text-align:left;border-bottom:1px solid #d8d8d8;padding:2px 5px;background:#fafafa}
+.minitable th{text-align:left;border-bottom:1px solid #d8d8d8;padding:2px 5px;background:var(--m-muted)}
 .minitable td{border-bottom:1px solid #f0f0f0;padding:2px 5px;color:#444}
 .actrow{display:flex;gap:6px;margin-top:10px}
-.gbtn{border:1px solid var(--border);border-radius:6px;padding:4px 9px;font-size:11px;font-weight:500;color:var(--ink-3);background:#fff}
-.dbtn{border:1px solid rgba(220,38,38,.3);border-radius:6px;padding:4px 9px;font-size:11px;font-weight:500;color:#dc2626;background:#fff}
-.pbtn{border-radius:6px;padding:5px 11px;font-size:11.5px;font-weight:600;color:#fff;background:var(--primary);display:inline-block}
+.gbtn{border:1px solid var(--m-border);border-radius:6px;padding:4px 9px;font-size:11px;font-weight:500;color:var(--m-ink3);background:var(--m-bg)}
+.dbtn{border:1px solid rgba(220,38,38,.3);border-radius:6px;padding:4px 9px;font-size:11px;font-weight:500;color:#dc2626;background:var(--m-bg)}
+.pbtn{border-radius:6px;padding:5px 11px;font-size:11.5px;font-weight:600;color:#fff;background:var(--m-primary);display:inline-block}
 .empty{padding:18px;text-align:center}
 .empty h4{font-size:12.5px;font-weight:600;margin-bottom:3px}
-.empty p{font-size:11px;color:var(--ink-3);margin-bottom:10px}
-.search{border:1px solid var(--border);border-radius:6px;padding:6px 9px;font-size:11.5px;color:#9a9a9a;margin-bottom:9px}
-.grouplab{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--ink-3);margin:8px 0 4px}
-.rowcard{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--border);border-radius:7px;padding:8px 10px;margin-bottom:6px}
+.empty p{font-size:11px;color:var(--m-ink3);margin-bottom:10px}
+.search{border:1px solid var(--m-border);border-radius:6px;padding:6px 9px;font-size:11.5px;color:#9a9a9a;margin-bottom:9px}
+.grouplab{font-size:9.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--m-ink3);margin:8px 0 4px}
+.rowcard{display:flex;align-items:center;justify-content:space-between;gap:8px;border:1px solid var(--m-border);border-radius:7px;padding:8px 10px;margin-bottom:6px}
 .rowcard .nm{font-size:11.5px;font-weight:600}
-.rowcard .meta{font-family:var(--mono);font-size:9px;color:var(--ink-3)}
+.rowcard .meta{font-family:var(--mono);font-size:9px;color:var(--m-ink3)}
 .rowcard.dim{opacity:.72;background:#fcfcfb}
 .badge{font-size:9px;font-weight:700;border-radius:9999px;padding:2px 7px;white-space:nowrap}
-.badge.ok{background:var(--ok-bg);color:var(--ok);border:1px solid var(--ok-line)}
-.badge.warn{background:var(--warn-bg);color:var(--warn);border:1px solid var(--warn-line)}
+.badge.ok{background:#f0fdf4;color:#166534;border:1px solid rgba(22,101,52,.25)}
+.badge.warn{background:#fffbeb;color:#92400e;border:1px solid rgba(180,83,9,.3)}
 .chartmock{padding:12px 14px}
 .chartmock .t{font-family:var(--serif);font-size:12.5px;font-weight:600}
-.chartmock .s{font-size:9px;color:var(--ink-3);margin:1px 0 8px}
-.srcline{border-top:1px solid var(--border);margin-top:8px;padding-top:5px;font-family:var(--mono);font-size:8px;color:#999}
+.chartmock .s{font-size:9px;color:var(--m-ink3);margin:1px 0 8px}
+.srcline{border-top:1px solid var(--m-border);margin-top:8px;padding-top:5px;font-family:var(--mono);font-size:8px;color:#999}
 svg text{font-family:var(--sans)}
 .cap{font-size:11.5px;color:var(--ink-3);margin-top:6px;line-height:1.5}
 .cap b{color:var(--ink-2)}
 .foot{margin-top:56px;border-top:1px solid var(--border);padding-top:16px;font-size:12px;color:var(--ink-3)}
-.foot code{font-family:var(--mono);font-size:.9em}
+a{color:var(--accent)}
 </style>
-</head>
-<body>
 <div class="doc">
   <h1>Charts &amp; datasets — what you reported, what we found, what's changing</h1>
-  <p class="sub">Follow-up to the review doc on the <i>France Camping Statistics</i> article and the Slack thread about
-  import vs dataset binding. Every item was traced to its exact cause in the code. Short version below, then each item
-  with its verdict and the fix (with pictures).</p>
-  <p class="date">9 July 2026 · verdicts verified against the live codebase · full engineering plan lives in prism-docs</p>
+  <p class="sub">Follow-up to the review of the <i>France Camping Statistics</i> article + the import/binding Slack
+  thread. Every item was traced to its exact cause in the code.</p>
+  <p class="date">9 July 2026 · verdicts verified against the live codebase · adversarially re-reviewed by a second model</p>
 
-  <div class="tldr">
-    <h2>TL;DR</h2>
-    <ul>
-      <li><b>The three red errors are real crashes, all likely one bug.</b> Changing chart type, "Add image to library"
-        and "Add view" all fail through the same server write machinery. PRISM records the real error behind the vague
-        message in its own run ledger — pulling that stack is fix step #1.</li>
-      <li><b>You were right that binding used to feel different.</b> Charts made "interactive from birth" (like this
-        import) have <b>no way back into the dataset picker at all</b> — no view, change, or unbind. Image charts you
-        upgrade by hand do. Charts get the same data panel tables and displays already have: dataset name as a link,
-        preview rows, Change dataset, Unbind.</li>
-      <li><b>The France dataset existed — the picker was hiding it.</b> The picker only lists datasets with a completed
-        revision, and only the 40 newest. New picker: search everything, and show "found, but not ready" with the
-        reason instead of pretending it doesn't exist.</li>
-      <li><b>Pie labels, tie colors, the source footnote — all confirmed bugs</b>, all being fixed (separator + spacing,
-        equal values share the accent color, internal dataset "sources" stop printing).</li>
-      <li><b>The X/Y axis pickers did exist</b> — they were retired on 4 July when chart internals changed; the axis
-        mapping moved into the bind-data flow. A pointer is being added where they used to be.</li>
-      <li><b>Imports are being split from binding</b> (the Slack decision): every imported chart arrives as a picture
-        first, then a separate binding pass connects charts to data — and agents finally get the same dataset search
-        you have at /datasets, which is why two of four charts didn't bind this time.</li>
-    </ul>
+  <div class="tiles">
+    <div class="tile"><div class="n">15</div><div class="l">issues reported — <b>every one traced</b> to a cause</div></div>
+    <div class="tile"><div class="n">3 → 1</div><div class="l">crashes, <b>one shared suspect</b> in the write machinery</div></div>
+    <div class="tile"><div class="n">0</div><div class="l">features actually removed — they were <b>hiding or moved</b></div></div>
+    <div class="tile"><div class="n">2 / 4</div><div class="l">import binds failed because <b>agents have no search</b></div></div>
+  </div>
+
+  <div class="index">
+    <a class="ix" href="#s1"><span class="t">3 Spec-tab buttons crash <span class="chip bug">bug</span></span><span class="d">Real server crashes, one suspect. Fix first — stacks likely already recorded.</span></a>
+    <a class="ix" href="#s2"><span class="t">Data tab shows IDs, not the dataset <span class="chip gap">gap</span></span><span class="d">Charts get the card every other bound section already has — link, preview, change, unbind.</span></a>
+    <a class="ix" href="#s3"><span class="t">"Can't bind an existing dataset" <span class="chip hidden">hiding</span></span><span class="d">The picker exists; it hides not-ready datasets and caps at 40. New: search everything.</span></a>
+    <a class="ix" href="#s3"><span class="t">Interactive-from-birth = no way back <span class="chip gap">gap</span></span><span class="d">Your hunch was right — born-interactive charts have zero data controls. Rebind is being built.</span></a>
+    <a class="ix" href="#s4"><span class="t">Pie labels glue &amp; overlap · tie colours <span class="chip bug">bug</span></span><span class="d">"over 78 5%" is a one-character bug; ties will share the accent colour.</span></a>
+    <a class="ix" href="#s4"><span class="t">Phantom "source" footnote <span class="chip bug">bug</span></span><span class="d">Internal dataset refs auto-print as a source. They stop printing entirely.</span></a>
+    <a class="ix" href="#s5"><span class="t">X/Y axis controls gone <span class="chip moved">moved</span></span><span class="d">They existed — retired 4 Jul into the bind flow. A pointer is being added.</span></a>
+    <a class="ix" href="#s6"><span class="t">Import ↔ binding split <span class="chip decision">agreed</span></span><span class="d">Imports go picture-first, binding becomes its own pass, agents get real search.</span></a>
   </div>
 
   <!-- 1 crashes -->
-  <section>
+  <section id="s1">
     <h2 class="sec">1 · The three "Server Components render" errors <span class="chip bug">bug — fix first</span></h2>
-    <p class="quote">"Unable to change chart type… unable to add image to library… unable to add view. An error occurred
-    in the Server Components render…"</p>
-    <p class="body">All three are <b>genuine crashes on the server</b>, not permission blocks. The vague wording is
-    deliberate — in production the system hides error details so they can't leak sensitive info. All three actions
-    travel through the same piece of write machinery (the bit that records every chart change as a revision), which was
-    reworked right before the current deploy — that's the prime suspect.</p>
-    <p class="body">The useful part: for two of the three, PRISM most likely <b>saved the real error message and stack
-    trace</b> in its internal run ledger at the moment you hit the button. Step one of the fix is reading those entries
-    — and even if they turn out to be missing, that absence narrows the search to one specific earlier stage. Step two
-    is the fix itself plus tests on all three buttons so this can't quietly happen again.</p>
+    <p class="quote">"Unable to change chart type… add image to library… add view."</p>
+    <ul class="tight">
+      <li><b>Real crashes on the server</b> — not permission blocks. Production hides the details on purpose; that's the vague wording.</li>
+      <li>All three buttons travel <b>one shared piece of write machinery</b>, reworked right before the current deploy — the prime suspect.</li>
+      <li>PRISM most likely <b>recorded the true error</b> in its run ledger the moment you clicked. Reading those entries is step one; even their absence narrows it to one earlier stage.</li>
+    </ul>
+    <div class="factline"><b>3</b> buttons <span class="sep">·</span> <b>1</b> write spine <span class="sep">·</span> fix ships with <b>tests on all three</b> so it can't quietly return</div>
   </section>
 
   <!-- 2 data tab -->
-  <section>
+  <section id="s2">
     <h2 class="sec">2 · Seeing a chart's dataset from Chart settings <span class="chip gap">real gap</span></h2>
-    <p class="quote">"One cannot see the dataset. It just shows the bound revision and Schema version. It would be good
-    to view the entire dataset here, or open the bound dataset from a button."</p>
-    <p class="body">Confirmed — and it's odd by our own standards: <b>tables, stat displays and collections all already
-    show</b> the dataset's name (as a link), its freshness, and Change/Unbind buttons in their Data tab. Charts are the
-    only data-bound thing that shows two raw IDs instead. Funnily, the little chip on the chart canvas <i>does</i> know
-    the dataset's name — the tab it opens just never displays it.</p>
+    <p class="quote">"One cannot see the dataset. It just shows the bound revision and Schema version."</p>
+    <div class="checkrow">
+      <span class="check"><span class="y">✓</span> Tables <small>name · link · change · unbind</small></span>
+      <span class="check"><span class="y">✓</span> Displays</span>
+      <span class="check"><span class="y">✓</span> Collections</span>
+      <span class="check"><span class="x">✗</span> Charts <small>two raw IDs</small></span>
+    </div>
+    <p class="body">Charts are the <b>only</b> data-bound section without the full data panel — even the little chip on
+    the chart canvas knows the dataset's name; the tab it opens just never shows it. Charts adopt the same card:</p>
     <div class="mockrow">
       <div>
         <span class="mocklab now">Now</span>
@@ -167,7 +232,7 @@ svg text{font-family:var(--sans)}
           <div class="mtabs"><span class="mtab">Spec</span><span class="mtab cur">Data</span><span class="mtab">Caption &amp; Alt</span></div>
           <div class="mbody">
             <div class="dscard">
-              <div class="nm"><a href="#">French campers by age group ↗</a></div>
+              <div class="nm"><a href="#s2">French campers by age group ↗</a></div>
               <div class="meta">cc.camping-statistics-multiple-locations.france · r6 · updated 2mo ago</div>
               <div class="fresh">● Current — following latest</div>
               <table class="minitable">
@@ -180,20 +245,18 @@ svg text{font-family:var(--sans)}
             </div>
           </div>
         </div>
-        <p class="cap"><b>Name is a link</b>, first rows preview inline, Change and Unbind exist. Same panel style as
-        tables/displays — one habit works everywhere.</p>
+        <p class="cap"><b>Name is a link</b>, first rows preview inline, Change + Unbind exist. One habit, every section type.</p>
       </div>
     </div>
   </section>
 
   <!-- 3 binding -->
-  <section>
+  <section id="s3">
     <h2 class="sec">3 · "There is no way to bind to an existing dataset" <span class="chip hidden">exists — but hides</span></h2>
     <p class="quote">"One can only click add new dataset… (this feature seemed to be there?)"</p>
-    <p class="body">The existing-dataset picker <b>is there and nothing removed it</b> — but it only lists datasets that
-    are "ready" (have a completed, promoted version), and only the 40 newest. A dataset still sitting in draft — or an
-    older one — simply vanishes, and the panel's only remaining button is "+ New dataset". That's exactly the trap: the
-    France dataset existed but wasn't surfaced, so the picker <i>looked</i> like create-only.</p>
+    <p class="body">The picker <b>is there and nothing removed it</b> — it just refuses to show datasets that aren't
+    "ready", so your France dataset was invisible and the panel <i>looked</i> create-only:</p>
+    <div class="factline">picker shows: <b>completed-revision datasets only</b> <span class="sep">·</span> <b>first 40</b> <span class="sep">·</span> drafts &amp; older ones <b>vanish silently</b></div>
     <div class="mockrow">
       <div>
         <span class="mocklab now">Now — the dead end</span>
@@ -205,7 +268,7 @@ svg text{font-family:var(--sans)}
             <span class="pbtn">+ New dataset ↗</span>
           </div>
         </div>
-        <p class="cap">Reads as "you can't bind existing data" — the feature is there, the empty state hides it.</p>
+        <p class="cap">Reads as "you can't bind existing data". The feature is there; the empty state hides it.</p>
       </div>
       <div>
         <span class="mocklab new">Coming — search everything, explain readiness</span>
@@ -221,41 +284,35 @@ svg text{font-family:var(--sans)}
             <div class="rowcard"><div class="nm" style="font-weight:500;color:#666">+ New dataset — paste data…</div></div>
           </div>
         </div>
-        <p class="cap">Search covers <b>every dataset in PRISM</b> (same search as the /datasets page). Not-ready
-        matches show <b>why</b> and the one-click path to fix, instead of disappearing.</p>
+        <p class="cap">Search covers <b>every dataset in PRISM</b> (same search as /datasets). Not-ready matches show
+        <b>why</b> + the one-click fix, instead of disappearing.</p>
       </div>
     </div>
-    <p class="body"><b>And the born-interactive trap you spotted is real.</b> Charts created as interactive from the
-    start (like this import's) currently have <b>no route back into the picker — ever</b>: no change, no unbind. Your
-    hunch ("is this because the chart was created interactive to start with?") was exactly right. The fix is the
-    Change&nbsp;dataset… / Unbind buttons above, plus the missing under-the-hood command they need. One honest caveat:
-    a chart's data connection is shared with published pages, so <b>changing the dataset under an already-published
-    chart goes through review</b> rather than applying silently — that's deliberate, it protects live pages.</p>
-    <p class="body">Also from the Slack thread: the dataset page will start listing the <b>charts</b> that use it (today
-    its "Bound consumers" list literally can't see charts — only tables/displays — which is why it claimed nothing used
-    your dataset), with links to the articles.</p>
+    <div class="callout"><b>The born-interactive trap you spotted is real — and deeper.</b> Charts created interactive
+    from the start (like this import's) have <b>no route back into the picker, ever</b> — and under the hood no command
+    to rebind one even exists yet. It's being built. One deliberate caveat: a chart's data connection is shared with
+    published pages, so changing (or unbinding) the dataset of an <b>already-published</b> chart routes through review
+    instead of applying silently.</div>
+    <p class="body">Also fixed from the thread: the dataset page's "Bound consumers" list <b>can't see charts at all</b>
+    today (only tables/displays) — that's why it claimed nothing used your dataset. It will list the charts, with
+    links to their articles.</p>
   </section>
 
   <!-- 4 looks -->
-  <section>
-    <h2 class="sec">4 · Chart looks: labels, colors, the source line <span class="chip bug">three bugs</span></h2>
+  <section id="s4">
+    <h2 class="sec">4 · Chart looks: labels, colours, the source line <span class="chip bug">three bugs</span></h2>
     <p class="quote">"'over 78 5%' reads as one… labels on top of each other… Occitanie is a different colour from
     Nouvelle-Aquitaine even though both are 26… the chart shouldn't have that source footnote."</p>
-    <p class="body">All three confirmed:</p>
-    <p class="body">• <b>Labels:</b> the pie draws its label and value with just a space between them — one character
-    away from right (the hover tooltip already says "Over 78: 5%"). And labels have no spacing logic at all, so two
-    small neighbouring slices print on top of each other. Fix: a separator with the value visually muted, plus a
-    spread-apart pass so labels can't collide.</p>
-    <p class="body">• <b>Colors:</b> the "largest bar gets the accent colour" rule picks only the <i>first</i> bar after
-    sorting — so a tie (26 and 26) arbitrarily colours one dark and one light, implying a difference that isn't in the
-    data. Fix: <b>equal values share the accent</b>. Editors also get emphasis controls (highlight a named bar,
-    good/bad tones, rank shading) — these already exist inside the chart engine, they just never got buttons. Free
-    colour-picking stays out deliberately: every chart keeps the site's palette so charts stay on-brand and readable.</p>
-    <p class="body">• <b>Source footnote:</b> when a chart has no hand-typed source, it auto-prints
-    "Source: <i>dataset name · internal key · r6</i>" — our internal bookkeeping, not a real source, and clearing the
-    Source field doesn't stop it (that's also why the Spec box looked empty while the chart showed one). Per the
-    decision in the doc: <b>internal dataset references stop printing entirely</b>; only a real, hand-entered or
-    external source will show.</p>
+    <ul class="tight">
+      <li><b>Labels:</b> label + value are joined by a bare space — the hover tooltip already says "Over 78: 5%"; the
+      canvas catches up. Plus a spread-apart pass so labels <b>can't</b> collide.</li>
+      <li><b>Colours:</b> only the <i>first</i> bar after sorting gets the accent, so a 26-vs-26 tie colours two ways.
+      Fix: <b>equal values share the accent</b>. Emphasis controls (highlight a bar, good/bad tones, rank shading)
+      already exist in the engine — they get buttons. Free colour-picking stays out: charts keep the site palette.</li>
+      <li><b>Source footnote:</b> with no hand-typed source, charts auto-print our internal dataset ref as "Source: …"
+      — and clearing the field doesn't stop it (that's the empty-Spec-box mystery). <b>Internal refs stop printing
+      entirely.</b></li>
+    </ul>
     <div class="mockrow">
       <div>
         <span class="mocklab now">Now</span>
@@ -263,18 +320,18 @@ svg text{font-family:var(--sans)}
           <div class="t">French campers by age group</div>
           <div class="s">Share of campers, 2024</div>
           <svg viewBox="0 0 400 130" width="100%" height="130">
-            <circle cx="95" cy="65" r="42" fill="none" stroke="#c7d2fe" stroke-width="20"/>
-            <path d="M95 23 A42 42 0 0 1 134 52" fill="none" stroke="#4338ca" stroke-width="20"/>
-            <line x1="138" y1="42" x2="158" y2="36" stroke="#bbb"/>
+            <circle cx="95" cy="65" r="42" fill="none" stroke="#c7d2fe" stroke-width="20"></circle>
+            <path d="M95 23 A42 42 0 0 1 134 52" fill="none" stroke="#4338ca" stroke-width="20"></path>
+            <line x1="138" y1="42" x2="158" y2="36" stroke="#bbb"></line>
             <text x="161" y="39" font-size="9" fill="#333">over 78 5%</text>
-            <line x1="139" y1="50" x2="158" y2="44" stroke="#bbb"/>
+            <line x1="139" y1="50" x2="158" y2="44" stroke="#bbb"></line>
             <text x="161" y="47" font-size="9" fill="#333">under 27 5%</text>
-            <rect x="250" y="18" width="120" height="13" fill="#4338ca"/><text x="250" y="45" font-size="8.5" fill="#333">Occitanie 26</text>
-            <rect x="250" y="52" width="120" height="13" fill="#c7d2fe"/><text x="250" y="79" font-size="8.5" fill="#333">Nouvelle-Aquitaine 26</text>
+            <rect x="250" y="18" width="120" height="13" fill="#4338ca"></rect><text x="250" y="45" font-size="8.5" fill="#333">Occitanie 26</text>
+            <rect x="250" y="52" width="120" height="13" fill="#c7d2fe"></rect><text x="250" y="79" font-size="8.5" fill="#333">Nouvelle-Aquitaine 26</text>
           </svg>
           <div class="srcline">Source: France camping statistics · cc.camping-statistics… · r6</div>
         </div></div>
-        <p class="cap">Glued labels, overlapping at 5%/5%; a tie coloured two ways; an internal key printed as "the source".</p>
+        <p class="cap">Glued, overlapping labels; a tie coloured two ways; an internal key printed as "the source".</p>
       </div>
       <div>
         <span class="mocklab new">Coming</span>
@@ -282,14 +339,14 @@ svg text{font-family:var(--sans)}
           <div class="t">French campers by age group</div>
           <div class="s">Share of campers, 2024</div>
           <svg viewBox="0 0 400 130" width="100%" height="130">
-            <circle cx="95" cy="65" r="42" fill="none" stroke="#c7d2fe" stroke-width="20"/>
-            <path d="M95 23 A42 42 0 0 1 134 52" fill="none" stroke="#4338ca" stroke-width="20"/>
-            <line x1="138" y1="42" x2="158" y2="30" stroke="#bbb"/>
+            <circle cx="95" cy="65" r="42" fill="none" stroke="#c7d2fe" stroke-width="20"></circle>
+            <path d="M95 23 A42 42 0 0 1 134 52" fill="none" stroke="#4338ca" stroke-width="20"></path>
+            <line x1="138" y1="42" x2="158" y2="30" stroke="#bbb"></line>
             <text x="161" y="33" font-size="9" fill="#333">Over 78 <tspan fill="#888">· 5%</tspan></text>
-            <line x1="139" y1="52" x2="158" y2="56" stroke="#bbb"/>
+            <line x1="139" y1="52" x2="158" y2="56" stroke="#bbb"></line>
             <text x="161" y="59" font-size="9" fill="#333">Under 27 <tspan fill="#888">· 5%</tspan></text>
-            <rect x="250" y="18" width="120" height="13" fill="#4338ca"/><text x="250" y="45" font-size="8.5" fill="#333">Occitanie 26</text>
-            <rect x="250" y="52" width="120" height="13" fill="#4338ca"/><text x="250" y="79" font-size="8.5" fill="#333">Nouvelle-Aquitaine 26</text>
+            <rect x="250" y="18" width="120" height="13" fill="#4338ca"></rect><text x="250" y="45" font-size="8.5" fill="#333">Occitanie 26</text>
+            <rect x="250" y="52" width="120" height="13" fill="#4338ca"></rect><text x="250" y="79" font-size="8.5" fill="#333">Nouvelle-Aquitaine 26</text>
           </svg>
           <div class="srcline" style="color:#ccc;text-decoration:line-through">internal source line — suppressed</div>
         </div></div>
@@ -299,63 +356,61 @@ svg text{font-family:var(--sans)}
   </section>
 
   <!-- 5 axes -->
-  <section>
+  <section id="s5">
     <h2 class="sec">5 · The X/Y axis controls <span class="chip moved">you were right — they moved</span></h2>
     <p class="quote">"Should have the ability to add X and Y axis… (this seemed to be there?)"</p>
-    <p class="body">They <b>did exist</b> — the old chart engine had axis/encoding pickers in Chart settings. They were
-    retired on <b>4 July</b> when charts moved to the new engine, and the "which column is X, which is Y" choice moved
-    into the <b>bind-data flow</b> — five days before your review, with nothing left behind pointing at the new home.
-    We're adding that pointer ("Axes come from the data binding — Change dataset…"). Written axis <i>titles</i> never
-    existed in either engine; axes label themselves from the data. If a real chart needs authored titles, that's a
-    product call to make separately rather than a bug.</p>
+    <p class="body">They <b>did exist</b>. The old chart engine's axis pickers were retired on <b>4 July</b> — five days
+    before your review — and the "which column is X, which is Y" choice moved into the <b>bind-data flow</b>, with
+    nothing left behind pointing at the new home. A pointer is being added ("Axes come from the data binding — Change
+    dataset…"). Written axis <i>titles</i> never existed in either engine; if a real chart needs them, that's a
+    separate product call, not a bug.</p>
   </section>
 
   <!-- 6 automation split -->
-  <section>
+  <section id="s6">
     <h2 class="sec">6 · Imports &amp; datasets: the split <span class="chip decision">agreed in Slack — now the plan</span></h2>
-    <p class="quote">"Not sure what the dataset logic is. You can see two worked and two didn't… It just didn't bind.
-    I'm not sure why."</p>
-    <p class="body"><b>Why it was inconsistent:</b> the import agent's instructions currently tell it to make charts
-    data-bound ("native") whenever it can recover the data, and a separate editorial rule says "trust the prose over
-    the chart". For the two charts whose source graphic showed more than the prose stated, the agent extended that
-    editorial rule to the <i>data</i> decision and fell back to picture-charts. Neither call was a malfunction — the
-    rules just overlap, and part of them lives in each run's brief rather than the shared playbook, so behaviour could
-    vary run to run.</p>
-    <p class="body"><b>What changes</b> (exactly the Slack decision, made concrete):</p>
-    <p class="body">1. <b>Import brings every chart in as a picture.</b> Always. Fast, safe, identical every run. The
-    prose-vs-chart rule stays for captions and claims — it no longer has any binding decision to leak into.</p>
-    <p class="body">2. <b>A separate "connect the data" pass binds charts to datasets afterwards</b> — walking a page's
-    picture-charts, finding matching datasets, and binding via the existing upgrade path (published pages keep their
-    review protection). Low-confidence matches get flagged for a human instead of guessed.</p>
-    <p class="body">3. <b>Agents get real dataset search.</b> Today an agent can only look a dataset up by its exact
-    internal key — it literally cannot search "france camping" (the search you use at /datasets isn't available to
-    agents). That's the actual reason the existing dataset didn't bind. The same name/key/description search is being
-    exposed to agents, for datasets and for the chart library.</p>
-    <p class="body">4. <b>Chart naming guidance</b> (SEO-searchable: "France" not "French", keyword first) goes into the
-    import brief, so titles are searchable for readers, editors, and agents alike.</p>
-    <div class="answer"><b>Answering the open Slack question</b> ("how did it find the other two? how would you instruct
-    it?"): today it pattern-matches from page context and known keys — there is no search for it to use, which is why
-    "how it found them" was unclear even in the logs. After #3, the honest answer becomes: it searches, same as you.
-    The run you flagged (<code>aur_0b67d8475bdf1916fb765cf2</code>) can be pulled from the run ledger to confirm the
-    exact matching steps it took.</div>
+    <p class="quote">"You can see two worked and two didn't… It just didn't bind. I'm not sure why."</p>
+    <span class="flowlab now">Now — one pass, overlapping rules</span>
+    <div class="flow old">
+      <div class="fbox"><span class="fk">import run</span><div class="ft">Import article + decide charts + bind datasets</div>
+      <div class="fd">"Make charts data-bound whenever possible" collides with "trust the prose over the chart" — the
+      editorial rule leaked into the data decision, differently per run. 2 of 4 bound.</div></div>
+    </div>
+    <span class="flowlab new">Coming — two passes, one job each</span>
+    <div class="flow">
+      <div class="fbox"><span class="fk">pass 1 · import</span><div class="ft">Every chart arrives as a picture</div>
+      <div class="fd">Always. Fast, safe, identical every run. The prose rule keeps governing captions — it has no
+      binding decision left to leak into.</div></div>
+      <div class="farrow">→</div>
+      <div class="fbox"><span class="fk">pass 2 · connect the data</span><div class="ft">Binding pass, with search</div>
+      <div class="fd">Walks the page's picture-charts, <b>searches</b> datasets ("france camping" now findable),
+      binds + re-renders. Published pages keep review protection; low-confidence matches get flagged, not guessed.</div></div>
+    </div>
+    <ul class="tight">
+      <li><b>The root cause, fixed:</b> agents could only look datasets up by exact internal key — the /datasets search
+      didn't exist for them. It will (datasets <i>and</i> the chart library).</li>
+      <li><b>Naming guidance</b> goes in the import brief: SEO-searchable titles ("France" not "French", keyword first).</li>
+    </ul>
+    <div class="answer"><b>The open Slack question</b> ("how did it find the other two?"): it pattern-matched page
+    context and known keys — there was no search to use, which is why the logs were unclear. After the split, the honest
+    answer becomes: it searches, same as you. Run <code>aur_0b67d8475bdf1916fb765cf2</code> can be pulled from the
+    ledger to confirm its exact steps.</div>
   </section>
 
   <!-- 7 not doing -->
-  <section>
+  <section id="s7">
     <h2 class="sec">7 · Called out, deliberately not changing</h2>
-    <p class="body">• <b>Free colour pickers on bars/slices</b> — emphasis controls yes; arbitrary hex colours no.
-    Charts inherit the site's brand palette so a site's charts look like one family (and stay readable).<br>
-    • <b>Binding from the dataset page</b> — the dataset page gains visibility (which charts/articles use it, with
-    links) but binding stays on the article side for now, where the context is.<br>
-    • <b>Authored axis titles</b> — see §5; separate product call if a real chart needs them.</p>
+    <ul class="tight">
+      <li><b>Free colour pickers</b> — emphasis controls yes; arbitrary hex no. A site's charts stay one family.</li>
+      <li><b>Binding from the dataset page</b> — it gains visibility (which charts/articles use it); binding stays on the article side, where the context is.</li>
+      <li><b>Authored axis titles</b> — see §5; a separate product call if a real chart needs them.</li>
+    </ul>
   </section>
 
   <div class="foot">
-    <b>Under the hood?</b> The build itself checked out healthier than expected — one render path, one bind machinery,
-    very little dead code; the crashes in §1 are the exception, not the pattern. The full engineering review, the
-    slice-by-slice plan, and the design boards live in prism-docs
-    (<code>plans/charts-tables-binding-ux/2026-07-09-editor-round-2.md</code>).
+    <b>Under the hood?</b> Healthier than expected — one render path, one bind machinery, very little dead code; the §1
+    crashes are the exception, not the pattern. Full engineering review + slice plan:
+    <code>prism-docs · plans/charts-tables-binding-ux/2026-07-09-editor-round-2.md</code>.
   </div>
 </div>
-</body>
 </html>
