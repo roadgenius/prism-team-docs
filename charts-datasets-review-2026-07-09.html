@@ -130,9 +130,10 @@ svg text{font-family:var(--sans)}
     deliberate — in production the system hides error details so they can't leak sensitive info. All three actions
     travel through the same piece of write machinery (the bit that records every chart change as a revision), which was
     reworked right before the current deploy — that's the prime suspect.</p>
-    <p class="body">The useful part: for two of the three, PRISM already <b>saved the real error message and stack
-    trace</b> in its internal run ledger at the moment you hit the button. Step one of the fix is reading those entries;
-    step two is the fix itself plus tests on all three buttons so this can't quietly happen again.</p>
+    <p class="body">The useful part: for two of the three, PRISM most likely <b>saved the real error message and stack
+    trace</b> in its internal run ledger at the moment you hit the button. Step one of the fix is reading those entries
+    — and even if they turn out to be missing, that absence narrows the search to one specific earlier stage. Step two
+    is the fix itself plus tests on all three buttons so this can't quietly happen again.</p>
   </section>
 
   <!-- 2 data tab -->
